@@ -1,0 +1,231 @@
+OBJETIVO
+Mantenimiento de Carreras
+
+ENTORNO
+    W_NRO_CARRERA           es numérico
+    W_COD_PILOTO            es numérico
+    W_POSICION              es numérico
+    W_OPCION                es alfanumérico
+    W_RESP                  es alfanumérico
+    W_POSICION_EXISTE       es alfanumérico
+    
+    archivo CARRERA
+    registro REG_CARRERA
+        NRO_CARRERA         es numérico
+        COD_PILOTO          es numérico
+        POSICION            es numérico
+        VUELTAS_TOTALES     es numérico
+        VUELTAS_REALIZADAS  es numérico
+        MONTO_PREMIO        es numérico
+        ACTUALIZADO         es alfanumérico
+    fin_registro
+    prefijo CAR
+
+    archivo PILOTO
+    registro REG_PILOTO
+        COD_PILOTO          es numérico
+        NOMBRE              es alfanumérico
+        COD_MARCA           es numérico
+        CARR_TERMINADAS     es numérico
+        CARR_GANADAS        es numérico
+        PUNTOS              es numérico
+    fin_registro
+    prefijo PIL
+
+CUERPO PRINCIPAL
+
+    inicio
+        ejecutar PROCESO_INICIAL
+        mientras W_NRO_CARRERA <> 0
+            ejecutar PROCESO_PRINCIPAL
+        fin_mientras
+        ejecutar PROCESO_FINAL
+    fin
+
+RUTINAS
+
+PROCESO_INICIAL:
+    imprimir "MANTENIMIENTO DE CARRERAS"
+    ejecutar ABRIR_ARCHIVOS
+    ejecutar INGRESAR_NRO_CARRERA
+retorno
+
+PROCESO_PRINCIPAL:
+    ejecutar INGRESAR_COD_PILOTO
+    mientras W_COD_PILOTO <> 0
+        ejecutar UBICAR_CARRERA
+        si existe(CARRERA)
+            si CAR_ACTUALIZADO = "N"
+                ejecutar DESPLEGAR_DATOS_CARRERA
+                ejecutar INGRESAR_OPCION
+                si W_OPCION = "M"
+                    ejecutar MODIFICA_CARRERA
+                sino
+                    si W_OPCION = "B"
+                        ejecutar BAJA_CARRERA
+                    fin_si
+                fin_si
+            sino
+                ejecutar ALTA_CARRERA                
+            fin_si
+        sino
+            imprimir "ERROR: El Piloto no existe en esta Carrera"
+        fin_si
+        ejecutar INGRESAR_COD_PILOTO
+    fin_mientras
+    ejecutar INGRESAR_NRO_CARRERA
+retorno
+
+PROCESO_FINAL:
+    ejecutar CERRAR_ARCHIVOS
+    imprimir "** FIN DEL PROCESO **"
+retorno
+
+ABRIR_ARCHIVOS:
+    abrir CARRERA
+    abrir PILOTO
+retorno
+
+INGRESAR_NRO_CARRERA:
+    ingresar "Ingrese el Número de la Carrera (Enter p/ Fin): ", W_NRO_CARRERA
+retorno
+
+INGRESAR_COD_PILOTO:
+    ingresar "Ingrese el Código del Piloto (Enter p/ Fin): ", W_COD_PILOTO
+retorno
+
+UBICAR_CARRERA:
+    CAR_NRO_CARRERA = W_NRO_CARRERA
+    CAR_COD_PILOTO  = W_COD_PILOTO
+    clave1 CAR_NRO_CARRERA + CAR_COD_PILOTO
+    leer REG_CARRERA
+retorno
+
+DESPLEGAR_DATOS_CARRERA:
+    imprimir "NÚMERO DE CARRERA: ", CAR_NRO_CARRERA
+    imprimir "CODIGO DEL PILOTO: ", CAR_COD_PILOTO
+    imprimir "POSICION: ", CAR_POSICION
+    imprimir "VUELTAS_TOTALES: ", CAR_VUELTAS_TOTALES
+    imprimir "VUELTAS_REALIZADAS: ", CAR_VUELTAS_REALIZADAS
+    imprimir "MONTO_PREMIO: ", CAR_MONTO_PREMIO
+    imprimir "ACTUALIZADO (S/N): ", CAR_ACTUALIZADO
+    ejecutar UBICAR_PILOTO
+    imprimir "NOMBRE DEL PILOTO: ", PIL_NOMBRE
+retorno
+
+
+UBICAR_PILOTO:
+    PIL_COD_PILOTO = W_COD_PILOTO
+    clave1 PIL_COD_PILOTO
+    leer PIL_PILOTO
+retorno
+
+
+INGRESAR_OPCION:
+    repetir
+        ingresar "Desea dar de (B)aja o (M)odificación?", W_OPCION
+    hasta W_OPCION = "B" or "M"
+retorno
+
+
+ALTA_CARRERA:
+    ejecutar INGRESAR_DATOS_PILOTO
+    ejecutar INGRESAR_CONFIRMACION
+    si W_RESP = "S"
+        CAR_ACTUALIZADO = "N"
+        grabar REG_CARRERA
+    fin_si
+retorno
+
+
+MODIFICA_CARRERA:
+    ejecutar INGRESAR_DATOS_PILOTO
+    ejecutar INGRESAR_CONFIRMACION
+    si W_RESP = "S"
+        regrabar REG_CARRERA
+    fin_si
+    ejecutar DESPLEGAR_DATOS_CARRERA
+retorno
+
+
+BAJA_CARRERA:
+    ejecutar INGRESAR_CONFIRMACION
+    si W_RESP = "S"
+        borrar REG_CARRERA
+    fin_si
+retorno
+
+
+INGRESAR_CONFIRMACION:
+    repetir
+        ingresar "Confirma la operación (S/N)? ", W_RESP
+    hasta W_OPCION = "B" or "M"
+retorno
+
+
+INGRESAR_DATOS_PILOTO:
+    ejecutar INGRESAR_POSICION
+    ejecutar INGRESAR_VUELTAS_TOTALES
+    ejecutar INGRESAR_VUELTAS_REALIZADAS
+    ejecutar INGRESAR_MONTO_PREMIO
+retorno
+
+
+INGRESAR_POSICION:
+    W_POSICION_EXISTE = "S"
+    mientras W_POSICION_EXISTE = "S"
+        ingresar "Ingrese la Posición del Piloto en la Carrera", W_POSICION
+        ejecutar VERIFICAR_POSICION
+    fin_mientras
+    CAR_POSICION = W_POSICION
+retorno
+
+
+INGRESAR_VUELTAS_TOTALES:
+    repetir
+        ingresar "Ingrese la Cantidad de Vueltas Totales (Mayor e Igual a 50)", CAR_VUELTAS_TOTALES
+    hasta CAR_VUELTAS_TOTALES >= 50
+retorno
+
+
+INGRESAR_VUELTAS_REALIZADAS:
+    repetir
+        ingresar "Ingrese la Cantidad de Vueltas Realizadas (Deberá ser mayor a Vueltas Totales)", CAR_VUELTAS_REALIZADAS
+    hasta CAR_VUELTAS_REALIZADAS <= CAR_VUELTAS_TOTALES
+retorno
+
+
+INGRESAR_MONTO_PREMIO:
+    repetir
+        ingresar "Ingrese el Monto del Premio (Deberá ser mayor a 10.000)", CAR_MONTO_PREMIO
+    hasta CAR_MONTO_PREMIO > 10000
+retorno
+
+
+VERIFICAR_POSICION:
+    W_POSICION_EXISTE = "N"
+    mientras W_POSICION_EXISTE = "N"
+        ejecutar LEER_SGTE_CARRERA
+        si CAR_POSICION <> W_POSICION
+            W_POSICION_EXISTE = "N"
+        sino
+            W_POSICION_EXISTE = "S"
+        fin_si
+    fin_mientras
+retorno
+
+
+LEER_SGTE_CARRERA:
+    si eof(CARRERA)
+        CAR_NRO_CARRERA = 0
+    sino
+        leer REG_CARRERA
+    fin_si
+retorno
+
+
+CERRAR_ARCHIVOS:
+    cerrar CARRERA
+    cerrar PILOTO
+retorno
+
