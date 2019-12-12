@@ -159,7 +159,7 @@ retorno
 INGRESAR_CONFIRMACION:
     repetir
         ingresar "Confirma la operación (S/N)? ", W_RESP
-    hasta W_OPCION = "B" or "M"
+    hasta W_OPCION = "S" or "N"
 retorno
 
 
